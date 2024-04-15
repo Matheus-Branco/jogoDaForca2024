@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace JogoDaForca.ConsoleApp
 {
     internal class Program
@@ -5,78 +9,97 @@ namespace JogoDaForca.ConsoleApp
         static void Main(string[] args)
         {
             Console.WriteLine("Bem-Vindo ao jogo da forca!!");
+            
+            JogoDaForca jogo = new JogoDaForca();
+            jogo.IniciarJogo();
+        }
+    }
 
-            string[] PalavraSecreta = 
-            {
+    public class JogoDaForca
+    {
+        private string[] PalavrasSecretas = {
             "ABACATE", "ABACAXI", "ACEROLA", "AÇAÍ", "ARAÇA",
             "BACABA", "BACURI", "BANANA", "CAJÁ", "CAJÚ",
             "CARAMBOLA", "CUPUAÇU", "GRAVIOLA", "GOIABA", "JABUTICABA",
             "JENIPAPO", "MAÇÃ", "MANGABA", "MANGA", "MARACUJÁ",
             "MURICI", "PEQUI", "PITANGA", "PITAYA", "SAPOTI",
             "BERGAMOTA", "UMBU", "UVA", "UVAIA"
-            };
+        };
+        private string PalavraEscolhida;
+        private char[] PalavraAtual;
+        private int TentativasRestantes;
+        private List<char> LetrasTentadas;
 
+        public JogoDaForca()
+        {
             Random random = new Random();
-            string palavraEscolhida = PalavraSecreta[random.Next(PalavraSecreta.Length)].ToUpper();
-            char[] palavraAtual = new char[palavraEscolhida.Length];
-
-            for (int i = 0; i < palavraEscolhida.Length; i++)
+            PalavraEscolhida = PalavrasSecretas[random.Next(PalavrasSecretas.Length)].ToUpper();
+            PalavraAtual = new char[PalavraEscolhida.Length];
+            for (int i = 0; i < PalavraEscolhida.Length; i++)
             {
-                palavraAtual[i] = '_';
+                PalavraAtual[i] = '_';
             }
+            TentativasRestantes = 5;
+            LetrasTentadas = new List<char>();
+        }
 
-            int tentativasRestantes = 5;
-            List<char> letrasTentadas = new List<char>();
-
+        public void IniciarJogo()
+        {
             Console.WriteLine("Bem-vindo ao Jogo da Forca!");
 
-            while (tentativasRestantes > 0 && palavraAtual.Contains('_'))
+            while (TentativasRestantes > 0 && PalavraAtual.Contains('_'))
             {
-                Console.WriteLine($"\nTentativas restantes: {tentativasRestantes}");
-                Console.WriteLine("Letras tentadas: " + string.Join(", ", letrasTentadas));
+                Console.WriteLine($"\nTentativas restantes: {TentativasRestantes}");
+                Console.WriteLine("Letras tentadas: " + string.Join(", ", LetrasTentadas));
 
                 Console.Write("\nDigite uma letra: ");
                 char letra = Console.ReadLine().ToUpper()[0];
 
-                if (letrasTentadas.Contains(letra))
+                if (LetrasTentadas.Contains(letra))
                 {
                     Console.WriteLine("Você já tentou essa letra. Tente outra.");
                     continue;
                 }
 
-                letrasTentadas.Add(letra);
+                LetrasTentadas.Add(letra);
 
-                bool acertou = false;
-                for (int i = 0; i < palavraEscolhida.Length; i++)
-                {
-                    if (palavraEscolhida[i] == letra)
-                    {
-                        palavraAtual[i] = letra;
-                        acertou = true;
-                    }
-                }
+                bool acertou = AtualizarPalavraAtual(letra);
 
                 if (!acertou)
                 {
-                    tentativasRestantes--;
+                    TentativasRestantes--;
                 }
 
-                ExibirPalavraAtual(palavraAtual);
+                ExibirPalavraAtual();
             }
 
-            if (!palavraAtual.Contains('_'))
+            if (!PalavraAtual.Contains('_'))
             {
                 Console.WriteLine("\nParabéns! Você acertou a palavra.");
             }
             else
             {
-                Console.WriteLine("\nVocê perdeu! A palavra era: " + palavraEscolhida);
+                Console.WriteLine("\nVocê perdeu! A palavra era: " + PalavraEscolhida);
             }
         }
 
-        static void ExibirPalavraAtual(char[] palavraAtual)
+        private bool AtualizarPalavraAtual(char letra)
         {
-            foreach (char c in palavraAtual)
+            bool acertou = false;
+            for (int i = 0; i < PalavraEscolhida.Length; i++)
+            {
+                if (PalavraEscolhida[i] == letra)
+                {
+                    PalavraAtual[i] = letra;
+                    acertou = true;
+                }
+            }
+            return acertou;
+        }
+
+        private void ExibirPalavraAtual()
+        {
+            foreach (char c in PalavraAtual)
             {
                 Console.Write(c + " ");
             }
